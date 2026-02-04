@@ -70,7 +70,7 @@ namespace _02_QuizGame
                     Console.ResetColor();
                 }
             }
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("End of quiz! You score was " + score);
             Console.ResetColor();
         }
