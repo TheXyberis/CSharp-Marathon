@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="../01-DiceGame/01-DiceGame/01-DiceGame.csproj" />
+  <Project Path="../02-QuizGame/02-QuizGame/02-QuizGame.csproj" />
+  <Project Path="../03-TurnBasedBattleSystem/03-TurnBasedBattleSystem/03-TurnBasedBattleSystem.csproj" />
+  <Project Path="../04-TicTacToe/04-TicTacToe/04-TicTacToe.csproj" />
+  <Project Path="../05-RetroSnakeGame/05-RetroSnakeGame/05-RetroSnakeGame.csproj" />
+  <Project Path="../06-HangmanGame/06-HangmanGame/06-HangmanGame.csproj" />
+</Solution>
