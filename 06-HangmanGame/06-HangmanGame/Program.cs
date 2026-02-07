@@ -8,74 +8,123 @@ namespace _06_HangmanGame
 {
     internal class Program
     {
+        private static readonly string[] WordBank = { "programming", "csharp", "developer", "software", "keyboard" };
+        private static readonly Random RandomGenerator = new Random();
         static void Main(string[] args)
         {
-            string word = "hello";
+            bool playAgain = true;
+
+            while (playAgain)
+            {
+                RunGameSession();
+
+                Console.WriteLine("\nPlay again? (y/n): ");
+                string answer = Console.ReadLine().ToLower();
+                playAgain = answer == "y";
+                Console.Clear();
+            }
+        }
+        static void RunGameSession()
+        {
+            string targetWord = WordBank[RandomGenerator.Next(WordBank.Length)].ToLower();
 
             int maxLives = 7;
             int currentLives = maxLives;
+            HashSet<char> guessedLetters = new HashSet<char>();
 
-            bool win = false;
-
-            List<char> guessedLetters = new List<char>();
-
-            while (currentLives > 0 && !win)
+            while (currentLives > 0)
             {
-                foreach (char c in word)
+                Console.Clear();
+                DisplayWordProgress(targetWord, guessedLetters);
+
+                Console.WriteLine($"\n\nLives: {currentLives}/{maxLives}");
+                Console.WriteLine("Guessed so far " + string.Join(", ", guessedLetters));
+                Console.WriteLine("Guess a letter: ");
+
+                string input = Console.ReadLine()?.ToLower();
+
+                if(string.IsNullOrEmpty(input) || !char.IsLetter(input[0]))
                 {
-                    if (guessedLetters.Contains(c))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.Write(c);
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.Write("_");
-                    }
+                    PrintColoredMessage("Please enter a valid single letter!", ConsoleColor.DarkYellow);
+                    continue;
                 }
-                Console.WriteLine("\nPlease guess a letter!");
-                Console.WriteLine($"{currentLives}/{maxLives} lives remaining");
 
-                char guess = Convert.ToChar(Console.ReadLine());
+                char guess = input[0];
 
-                if (word.Contains(guess) && !guessedLetters.Contains(guess))
+                if (guessedLetters.Contains(guess))
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine("Correct");
+                    PrintColoredMessage($"You already tried '{guess}'", ConsoleColor.DarkYellow);
+                    continue;
+                }
+
+                guessedLetters.Add(guess);
+
+                if (targetWord.Contains(guess))
+                {
+                    PrintColoredMessage("Correct!", ConsoleColor.Green);
+                }
+                else
+                {
+                    PrintColoredMessage("Incorrect!", ConsoleColor.Red);
+                    currentLives--;
+                }
+
+                if(targetWord.All(c => guessedLetters.Contains(c)))
+                {
+                    EndGame(true, targetWord, guessedLetters);  
+                    return;
+                }
+            }
+            EndGame(false, targetWord, guessedLetters);
+        }
+
+        static void DisplayWordProgress(string word, HashSet<char> guessed)
+        {
+            foreach(char c in word)
+            {
+                if (guessed.Contains(c))
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(c + " ");
                     Console.ResetColor();
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Incorrect");
-                    Console.ResetColor();
-                    currentLives--;
+                    Console.Write("_ ");
                 }
-                guessedLetters.Add(guess);
-
-                bool wordComplete = true;
-                foreach (char c in word)
-                {
-                    if (!guessedLetters.Contains(c))
-                    {
-                        wordComplete = false;
-                    }
-                }
-                win = wordComplete;
             }
-            if (win)
+        }
+
+        static void PrintColoredMessage(string message, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ResetColor();
+            System.Threading.Thread.Sleep(800); //brief pause so the player can see the feedback
+        }
+
+        static void EndGame(bool won, string word, HashSet<char> guessedLetters = null)
+        {
+            Console.Clear();
+
+            if(won && guessedLetters != null)
             {
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine("Congratulations, you win!");
-                Console.ResetColor();
+                DisplayWordProgress(word, guessedLetters);
+                Console.WriteLine("\n");
+            }
+
+            if (won)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Congratulations! YOU WIN!");
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("You lose...");
-                Console.ResetColor();
+                Console.WriteLine("GAME OVER");
+                Console.WriteLine($"The word was: {word.ToUpper()}");
             }
+            Console.ResetColor();
         }
     }
 }
