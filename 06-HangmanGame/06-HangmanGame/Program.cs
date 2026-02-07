@@ -35,6 +35,7 @@ namespace _06_HangmanGame
             while (currentLives > 0)
             {
                 Console.Clear();
+                DrawHangman(currentLives);
                 DisplayWordProgress(targetWord, guessedLetters);
 
                 Console.WriteLine($"\n\nLives: {currentLives}/{maxLives}");
@@ -43,7 +44,7 @@ namespace _06_HangmanGame
 
                 string input = Console.ReadLine()?.ToLower();
 
-                if(string.IsNullOrEmpty(input) || !char.IsLetter(input[0]))
+                if (string.IsNullOrEmpty(input) || !char.IsLetter(input[0]))
                 {
                     PrintColoredMessage("Please enter a valid single letter!", ConsoleColor.DarkYellow);
                     continue;
@@ -69,18 +70,17 @@ namespace _06_HangmanGame
                     currentLives--;
                 }
 
-                if(targetWord.All(c => guessedLetters.Contains(c)))
+                if (targetWord.All(c => guessedLetters.Contains(c)))
                 {
-                    EndGame(true, targetWord, guessedLetters);  
+                    EndGame(true, targetWord, guessedLetters);
                     return;
                 }
             }
             EndGame(false, targetWord, guessedLetters);
         }
-
         static void DisplayWordProgress(string word, HashSet<char> guessed)
         {
-            foreach(char c in word)
+            foreach (char c in word)
             {
                 if (guessed.Contains(c))
                 {
@@ -94,7 +94,33 @@ namespace _06_HangmanGame
                 }
             }
         }
+        static void DrawHangman(int lives)
+        {
+            string[] stages =
+            {
+                // 0 lives: Full body
+                "  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========", 
+                // 1 life: Missing one leg
+                "  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========",
+                // 2 lives: Missing both legs
+                "  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========",
+                // 3 lives: Missing one arm
+                "  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========",
+                // 4 lives: Just head and torso
+                "  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========",
+                // 5 lives: Just head
+                "  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========",
+                // 6 lives: Just rope
+                "  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========",
+                // 7 lives: Empty gallows
+                "  +---+\n  |    \n      |\n      |\n      |\n      |\n========="
+            };
 
+            if (lives < stages.Length)
+            {
+                Console.WriteLine(stages[lives]);
+            }
+        }
         static void PrintColoredMessage(string message, ConsoleColor color)
         {
             Console.ForegroundColor = color;
@@ -102,12 +128,13 @@ namespace _06_HangmanGame
             Console.ResetColor();
             System.Threading.Thread.Sleep(800); //brief pause so the player can see the feedback
         }
-
         static void EndGame(bool won, string word, HashSet<char> guessedLetters = null)
         {
             Console.Clear();
 
-            if(won && guessedLetters != null)
+            DrawHangman(won ? 7 : 0);
+
+            if (won && guessedLetters != null)
             {
                 DisplayWordProgress(word, guessedLetters);
                 Console.WriteLine("\n");
